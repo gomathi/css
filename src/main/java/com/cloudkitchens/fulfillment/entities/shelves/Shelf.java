@@ -1,25 +1,25 @@
 package com.cloudkitchens.fulfillment.entities.shelves;
 
-import com.cloudkitchens.fulfillment.entities.Temp;
+import com.cloudkitchens.fulfillment.entities.Temperature;
 import com.google.common.base.MoreObjects;
 
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Stores the shelf information like capacity, temp.
+ * Stores the shelf information like capacity, temperature.
  */
-@ThreadSafe public class ShelfInfo {
+@ThreadSafe public class Shelf {
 
     private final String id;
     private final double decayRateFactor;
     private final int capacity;
-    private final Temp temp;
+    private final Temperature temperature;
 
-    public ShelfInfo(String id, double decayRateFactor, int capacity, Temp temp) {
+    public Shelf(String id, double decayRateFactor, int capacity, Temperature temperature) {
         this.id = id;
         this.decayRateFactor = decayRateFactor;
         this.capacity = capacity;
-        this.temp = temp;
+        this.temperature = temperature;
     }
 
     public String getId() {
@@ -34,12 +34,12 @@ import javax.annotation.concurrent.ThreadSafe;
         return capacity;
     }
 
-    public Temp getTemp() {
-        return temp;
+    public Temperature getTemperature() {
+        return temperature;
     }
 
     @Override public String toString() {
-        return MoreObjects.toStringHelper(ShelfInfo.class).add("id", id).add("decayRateFactor", decayRateFactor).add("capacity", capacity)
-            .add("temp", temp).toString();
+        return MoreObjects.toStringHelper(Shelf.class).add("id", id).add("decayRateFactor", decayRateFactor).add("capacity", capacity)
+            .add("temperature", temperature).toString();
     }
 }

@@ -1,10 +1,10 @@
 package com.cloudkitchens.fulfillment.entities.shelves;
 
-import com.cloudkitchens.fulfillment.entities.Temp;
+import com.cloudkitchens.fulfillment.entities.Temperature;
 import com.cloudkitchens.fulfillment.entities.orders.Order;
-import com.cloudkitchens.fulfillment.entities.orders.OrderImpl;
 import com.cloudkitchens.fulfillment.entities.orders.OrderState;
 import com.cloudkitchens.fulfillment.entities.orders.comparators.OrderExpiryComparator;
+import com.cloudkitchens.fulfillment.entities.shelves.observers.IShelfPodObserver;
 import com.cloudkitchens.fulfillment.entities.shelves.util.ShelfUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -28,11 +28,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of ShelfPod, this manages group of shelves. If there is an overflow shelf, that will be used for
+ * Implementation of IShelfPod, this manages group of shelves. If there is an overflow shelf, that will be used for
  * regular shelves in case if the regular shelves dont have any space to store an order.
  * <p>
  * In case if CloudKitchens is growing much fast, we can spawn multiple instances of this class and handle load balancing
- * across multiple {@link ShelfPod}
+ * across multiple {@link IShelfPod}
  *
  * <p>
  * The following are the key functions supported
@@ -54,14 +54,14 @@ import java.util.stream.Collectors;
  * which will expire sooner across multiple shelves.
  */
 
-@Slf4j @ThreadSafe public class BaseShelfPodImpl implements ShelfPod {
+@Slf4j @ThreadSafe public class BaseShelfPod implements IShelfPod {
 
-    private static final Map<Temp, Map<ShelfOrderState, OrderState>> STORED_AND_EXPIRED_ORDER_STATE_NAMES =
+    private static final Map<Temperature, Map<ShelfOrderState, OrderState>> STORED_AND_EXPIRED_ORDER_STATE_NAMES =
         getStoredAndExpiredOrderStateNames();
 
-    private final List<ShelfInfo> shelfInfos;
-    private final Map<Temp, ShelfInfo> tempShelfInfoMap;
-    private final Map<Temp, Double> decayRateFactors;
+    private final List<Shelf> shelves;
+    private final Map<Temperature, Shelf> tempShelfInfoMap;
+    private final Map<Temperature, Double> decayRateFactors;
     private final Comparator<Order> orderExpiryComparator;
 
     /**
@@ -71,37 +71,37 @@ import java.util.stream.Collectors;
      */
     private final BlockingQueue<Order> ordersQueue;
     // A semaphore is associated with different kinds of shelves. Any order addition/removal from the shelf is controlled through these semaphores.
-    private final Map<Temp, Semaphore> spaces;
+    private final Map<Temperature, Semaphore> spaces;
 
-    @Inject public BaseShelfPodImpl(@Assisted List<ShelfInfo> shelfInfos) {
-        this.shelfInfos = ImmutableList.copyOf(shelfInfos);
-        this.tempShelfInfoMap = ShelfUtils.getTempShelfInfoMap(shelfInfos);
-        this.decayRateFactors = ShelfUtils.getDecayRateFactors(shelfInfos);
+    @Inject public BaseShelfPod(@Assisted List<Shelf> shelves) {
+        this.shelves = ImmutableList.copyOf(shelves);
+        this.tempShelfInfoMap = ShelfUtils.getTempShelfInfoMap(shelves);
+        this.decayRateFactors = ShelfUtils.getDecayRateFactors(shelves);
         this.orderExpiryComparator = new OrderExpiryComparator(decayRateFactors);
         this.ordersQueue = new PriorityBlockingQueue<>(16, orderExpiryComparator);
-        this.spaces = createSpaces(shelfInfos);
+        this.spaces = createSpaces(shelves);
     }
 
-    private static Map<Temp, Semaphore> createSpaces(List<ShelfInfo> shelfInfos) {
-        Map<Temp, Semaphore> spaces = new HashMap<>();
-        for (ShelfInfo shelfInfo : shelfInfos) {
-            spaces.put(shelfInfo.getTemp(), new Semaphore(shelfInfo.getCapacity(), true));
+    private static Map<Temperature, Semaphore> createSpaces(List<Shelf> shelves) {
+        Map<Temperature, Semaphore> spaces = new HashMap<>();
+        for (Shelf shelf : shelves) {
+            spaces.put(shelf.getTemperature(), new Semaphore(shelf.getCapacity(), true));
         }
         return ImmutableMap.copyOf(spaces);
     }
 
     private double getDecayRate(Order order) {
         return order.getOrderState() == OrderState.StoredInOverflowShelf ?
-            decayRateFactors.get(Temp.Overflow) :
-            decayRateFactors.get(order.getTemp());
+            decayRateFactors.get(Temperature.Overflow) :
+            decayRateFactors.get(order.getTemperature());
     }
 
-    private double getDecayRate(Temp shelfType) {
+    private double getDecayRate(Temperature shelfType) {
         return decayRateFactors.get(shelfType);
     }
 
     /**
-     * Returns one of the shelf types of value {@link Temp}  given the order.
+     * Returns one of the shelf types of value {@link Temperature}  given the order.
      * <p>
      * An order's state can be only {@link OrderState#StoredInRegularShelf} or {@link OrderState#StoredInOverflowShelf}
      * if its stored in one of the shelves. An order's state should be one of the above before adding an order into the shelf.
@@ -114,16 +114,16 @@ import java.util.stream.Collectors;
      * @throws IllegalStateException if the order's {@link OrderState} is not in
      *                               {{@link OrderState#StoredInRegularShelf}, {@link OrderState#StoredInOverflowShelf}}
      */
-    private static Temp getShelfTypeWhileInsideShelf(Order order) {
+    private static Temperature getShelfTypeWhileInsideShelf(Order order) {
         if (order.getOrderState() == OrderState.StoredInRegularShelf)
-            return order.getTemp();
+            return order.getTemperature();
         else if (order.getOrderState() == OrderState.StoredInOverflowShelf)
-            return Temp.Overflow;
+            return Temperature.Overflow;
         throw new IllegalStateException("Given order's state is not in a valid condition.");
     }
 
-    @Override public List<ShelfInfo> getShelfInfos() {
-        return shelfInfos;
+    @Override public List<Shelf> getShelves() {
+        return shelves;
     }
 
     /**
@@ -135,13 +135,14 @@ import java.util.stream.Collectors;
      *
      * @return
      */
-    private static Map<Temp, Map<ShelfOrderState, OrderState>> getStoredAndExpiredOrderStateNames() {
-        Map<Temp, Map<ShelfOrderState, OrderState>> storedAndExpiredOrderStateNames = new HashMap<>();
-        Set<Temp> regularShelves = Arrays.asList(Temp.values()).stream().filter(temp -> temp != Temp.Overflow).collect(Collectors.toSet());
-        for (Temp temp : Temp.values()) {
+    private static Map<Temperature, Map<ShelfOrderState, OrderState>> getStoredAndExpiredOrderStateNames() {
+        Map<Temperature, Map<ShelfOrderState, OrderState>> storedAndExpiredOrderStateNames = new HashMap<>();
+        Set<Temperature> regularShelves =
+            Arrays.asList(Temperature.values()).stream().filter(temp -> temp != Temperature.Overflow).collect(Collectors.toSet());
+        for (Temperature temperature : Temperature.values()) {
             Map<ShelfOrderState, OrderState> shelfMap = new HashMap<>();
             for (ShelfOrderState shelfOrderState : ShelfOrderState.values()) {
-                if (regularShelves.contains(temp)) {
+                if (regularShelves.contains(temperature)) {
                     shelfMap.put(shelfOrderState,
                         shelfOrderState == ShelfOrderState.Stored ? OrderState.StoredInRegularShelf : OrderState.ExpiredInRegularShelf);
                 } else {
@@ -149,7 +150,7 @@ import java.util.stream.Collectors;
                         shelfOrderState == ShelfOrderState.Stored ? OrderState.StoredInOverflowShelf : OrderState.ExpiredInOverflowShelf);
                 }
             }
-            storedAndExpiredOrderStateNames.put(temp, ImmutableMap.copyOf(shelfMap));
+            storedAndExpiredOrderStateNames.put(temperature, ImmutableMap.copyOf(shelfMap));
         }
         return ImmutableMap.copyOf(storedAndExpiredOrderStateNames);
     }
@@ -164,7 +165,7 @@ import java.util.stream.Collectors;
      * @param shelfOrderState
      * @return
      */
-    private OrderState getOrderState(Temp shelfType, ShelfOrderState shelfOrderState) {
+    private OrderState getOrderState(Temperature shelfType, ShelfOrderState shelfOrderState) {
         return STORED_AND_EXPIRED_ORDER_STATE_NAMES.get(shelfType).get(shelfOrderState);
     }
 
@@ -183,13 +184,13 @@ import java.util.stream.Collectors;
      * @return
      */
     private AddResult addOrder(Order order, OrderState prevState, boolean storeInOverflowShelf) {
-        Temp shelfType = storeInOverflowShelf ? Temp.Overflow : order.getTemp();
+        Temperature shelfType = storeInOverflowShelf ? Temperature.Overflow : order.getTemperature();
         Semaphore shelfSpaces = spaces.get(shelfType);
 
         boolean added = false;
         boolean spaceAcquired = false;
         try {
-            if (prevState == OrderState.Created && order.isExpired(getDecayRate(shelfType))) {
+            if (prevState == OrderState.Created && order.hasExpired(getDecayRate(shelfType))) {
                 order.setOrderState(OrderState.CameExpired);
             } else {
                 if (prevState == OrderState.StoredInOverflowShelf) {
@@ -229,11 +230,11 @@ import java.util.stream.Collectors;
                 shelfSpaces.release();
             }
         }
-        return new AddResultImpl(added, order.getOrderState(), tempShelfInfoMap.get(shelfType));
+        return new AddResult(added, order.getOrderState(), tempShelfInfoMap.get(shelfType));
     }
 
     /**
-     * Adds the given order to any non overflow shelf that is appropriate for the given Order's Temp.
+     * Adds the given order to any non overflow shelf that is appropriate for the given Order's Temperature.
      * If there is no available space in the non overflow shelf, then add attempt is tried on the overflow shelf,
      * and returns the result of the addition.
      * <p>
@@ -253,9 +254,9 @@ import java.util.stream.Collectors;
     }
 
     /**
-     * Functionally {@link #addOrder(Order)} and {@link #moveOrder(Order)} both store the order to ShelfPod.
+     * Functionally {@link #addOrder(Order)} and {@link #moveOrder(Order)} both store the order to IShelfPod.
      * But addOrder is triggered through external services like KitchenService, where as moveOrder is triggered
-     * through the internal ShelfPod maintaining threads.
+     * through the internal IShelfPod maintaining threads.
      * <p>
      * One more difference is {@link #addOrder(Order)} is non blocking call and {@link #moveOrder(Order)} is a blocking call.
      * This is required as overflow shelf needs to move an order from itself to regular shelf if the space is available.
@@ -280,7 +281,7 @@ import java.util.stream.Collectors;
     protected boolean removeOrder(Order order) {
         boolean removed = ordersQueue.remove(order);
         if (removed) {
-            Temp shelfType = getShelfTypeWhileInsideShelf(order);
+            Temperature shelfType = getShelfTypeWhileInsideShelf(order);
             spaces.get(shelfType).release();
             log.info("Removed order, and orderId={}", order.getId());
         }
@@ -299,8 +300,10 @@ import java.util.stream.Collectors;
             Order order = ordersQueue.poll();
             if (order == null)
                 return null;
-            if (order.isExpired(getDecayRate(order))) {
-                order.setOrderState(getOrderState(getShelfTypeWhileInsideShelf(order), ShelfOrderState.Expired));
+            Temperature shelfType = getShelfTypeWhileInsideShelf(order);
+            spaces.get(shelfType).release();
+            if (order.hasExpired(getDecayRate(order))) {
+                order.setOrderState(getOrderState(shelfType, ShelfOrderState.Expired));
                 continue;
             }
             order.setOrderState(OrderState.PickedUpForDelivery);
@@ -317,9 +320,17 @@ import java.util.stream.Collectors;
         List<Order> orders = new ArrayList<>(ordersQueue);
         // Since the queue provides weak iterator, we may have got orders which were already delivered, or expired.
         // So we make a copy and filter only the orders that are currently in the shelf.
-        orders = orders.stream().map(order -> ((OrderImpl) order).getDeepCopy()).filter(order -> order.isInCurrentlyInAnyShelf())
+        orders = orders.stream().map(order -> ((Order) order).getDeepCopy()).filter(order -> order.isCurrentlyInAnyShelf())
             .collect(Collectors.toList());
         Collections.sort(orders, orderExpiryComparator);
         return orders;
+    }
+
+    @Override public boolean addObserver(IShelfPodObserver shelfPodObserver) {
+        return false;
+    }
+
+    @Override public boolean removeObserver(IShelfPodObserver shelfPodObserver) {
+        return false;
     }
 }
