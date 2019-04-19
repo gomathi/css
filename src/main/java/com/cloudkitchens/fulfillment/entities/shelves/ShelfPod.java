@@ -7,10 +7,7 @@ import com.cloudkitchens.fulfillment.entities.orders.Order;
 import com.cloudkitchens.fulfillment.entities.orders.OrderState;
 import com.cloudkitchens.fulfillment.entities.orders.comparators.OrderExpiryComparator;
 import com.cloudkitchens.fulfillment.entities.shelves.observers.IShelfPodObserver;
-import com.cloudkitchens.fulfillment.entities.shelves.util.ShelfUtils;
 import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Comparator;
@@ -64,10 +61,9 @@ import java.util.concurrent.PriorityBlockingQueue;
 
     private volatile ExecutorService executorService;
 
-    @Inject public ShelfPod(@Assisted List<Shelf> shelves) {
+    public ShelfPod(List<Shelf> shelves) {
         super(shelves);
-        this.watchQueuesForMovableOrders =
-            createWatchQueuesForMovableOrders(new OrderExpiryComparator(ShelfUtils.getDecayRateFactors(shelves)));
+        this.watchQueuesForMovableOrders = createWatchQueuesForMovableOrders(new OrderExpiryComparator(getDecayRateFactors(shelves)));
         this.watchQueueForExpirableOrders = new DelayQueue<>();
         this.updatesQueue = new LinkedBlockingQueue<>();
         this.observers = new ConcurrentLinkedQueue<>();
@@ -298,8 +294,9 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 
     /**
-     * This thread watches expirable orders queue({@link DelayQueue} is used for expirable queue, which allows an element to be removed only after the delay becomes zero).
+     * This thread watches expirable orders queue. {@link DelayQueue} is used for expirable queue, which allows an element to be removed only after the delay becomes zero.
      * If the queue returns an order, then this thread marks that order as expired.
+     * Since delayQueue is a blocking queue, if the thread does not have
      */
     private class MarkExpiredThread implements Runnable {
 

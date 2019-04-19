@@ -8,9 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Maintains order information, order state information, and shelf value of the order.
+ */
 @ThreadSafe @Slf4j public class Order {
 
     private static final Set<OrderState> END_STATES = ImmutableSet
@@ -132,39 +134,92 @@ import java.util.concurrent.atomic.AtomicReference;
         return (expiredTime - System.currentTimeMillis()) <= 0;
     }
 
-    public long getNormalizedValue(double decayRateFactor) {
-        return getCurrShelfValueInMs(decayRateFactor) / getShelfLifeInSecs() / 1000;
+    /**
+     * Returns the normalized value of each order in the shelf.
+     *
+     * @param decayRateFactor
+     * @return
+     */
+    public double getNormalizedValue(double decayRateFactor) {
+        double result = getCurrShelfValueInMs(decayRateFactor) / getShelfLifeInSecs() / 1000.0;
+        return result;
     }
 
+    /**
+     * Gets the expiry timestamp, this will change specific to each shelf.
+     *
+     * @param decayRateFactor
+     * @return
+     */
     public long getExpiryTimestampInMs(double decayRateFactor) {
         return getCreatedTimestamp() + getCurrShelfValueInMs(decayRateFactor) - getTimeSpentOnOverflowShelfInMs();
     }
 
-
+    /**
+     * Gets the orderState of the given order.
+     *
+     * @return
+     */
     public OrderState getOrderState() {
         return orderStateAtomicReference.get();
     }
 
+    /**
+     * Sets the orderState to the given value.
+     *
+     * @param orderState
+     */
     public void setOrderState(OrderState orderState) {
         orderStateAtomicReference.set(orderState);
     }
 
+    /**
+     * Sets the current orderState to newState if the oldState matches.
+     *
+     * @param oldState
+     * @param newState
+     * @return
+     */
     public boolean compareAndSet(OrderState oldState, OrderState newState) {
         return orderStateAtomicReference.compareAndSet(oldState, newState);
     }
 
+    /**
+     * If the order is reached one of the stages {Expired, PickedUp} then this value returns true, otherwise false.
+     *
+     * @return
+     */
     public boolean hasReachedEndState() {
         return END_STATES.contains(getOrderState());
     }
 
+    /**
+     * If the order is currently stored in any of the regular shelf or overflow shelf, then this returns true.
+     * Otherwise returns false.
+     *
+     * @return
+     */
     public boolean isCurrentlyInAnyShelf() {
         return getOrderState() == OrderState.StoredInRegularShelf || getOrderState() == OrderState.StoredInOverflowShelf;
     }
 
+    /**
+     * If an order stays in overflow shelf for a period of time, and then if it moves back to regular shelf, then we need to account the time
+     * spent on overflow shelf, and subtract that value from shelf value of this order. This function provides the time spent on the
+     * overflow shelf.
+     *
+     * @return
+     */
     public long getTimeSpentOnOverflowShelfInMs() {
         return timeSpentOnOverflowShelfInMs;
     }
 
+    /**
+     * If an order stays in overflow shelf for a period of time, and then if it moves back to regular shelf, then we need to account the time
+     * spent on overflow shelf, and subtract that value from shelf value of this order. This provides the ability to set that value.
+     *
+     * @param timeSpentOnOverflowShelfInMs
+     */
     public void setTimeSpentOnOverflowShelfInMs(long timeSpentOnOverflowShelfInMs) {
         this.timeSpentOnOverflowShelfInMs = timeSpentOnOverflowShelfInMs;
     }

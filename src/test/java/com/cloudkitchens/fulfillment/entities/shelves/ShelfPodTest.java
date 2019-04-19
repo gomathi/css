@@ -3,21 +3,19 @@ package com.cloudkitchens.fulfillment.entities.shelves;
 import com.cloudkitchens.fulfillment.entities.Temperature;
 import com.cloudkitchens.fulfillment.entities.orders.Order;
 import com.cloudkitchens.fulfillment.entities.orders.OrderState;
-import com.cloudkitchens.fulfillment.entities.orders.comparators.OrderExpiryComparator;
-import com.cloudkitchens.fulfillment.entities.shelves.util.ShelfUtils;
+import com.cloudkitchens.fulfillment.entities.shelves.observers.IShelfPodObserver;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.cloudkitchens.fulfillment.entities.shelves.BaseShelfPodTest.createOrder;
-import static com.cloudkitchens.fulfillment.entities.shelves.BaseShelfPodTest.generateRegularShelfInfosAndOverflowShelfInfo;
 import static com.cloudkitchens.fulfillment.entities.shelves.BaseShelfPodTest.generateOrders;
+import static com.cloudkitchens.fulfillment.entities.shelves.BaseShelfPodTest.generateRegularShelfInfosAndOverflowShelfInfo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -56,9 +54,8 @@ public class ShelfPodTest {
         }
     }
 
+    // Lets test mover thread with multiple shelves.
     @Test public void testMoverThreadWithMultipleShelves() throws InterruptedException {
-        Temperature temperature = Temperature.Hot;
-
         List<Shelf> shelves = generateRegularShelfInfosAndOverflowShelfInfo(5, 15, 2, 1);
         ShelfPod shelfPod = new ShelfPod(shelves);
         shelfPod.startBackgroundActivities();
@@ -92,7 +89,7 @@ public class ShelfPodTest {
         }
     }
 
-    // Tests whether the mark expired thread automatically expires the orders
+    // Tests whether the mark expired thread automatically expires the orders in an overflow shelf
     @Test public void testExpireThreadInOverflowShelf() throws InterruptedException {
         Temperature temperature = Temperature.Hot;
         // Setting overflow shelf decay rate factor to 10, so the orders will expire sooner, and this test can run quicker.
@@ -117,6 +114,7 @@ public class ShelfPodTest {
         }
     }
 
+    // Tests whether the mark expired thread automatically expires the orders in an regular shelf
     @Test public void testExpireThreadInRegularShelf() throws InterruptedException {
         Temperature temperature = Temperature.Hot;
         // Setting overflow shelf decay rate factor to 10, so the orders will expire sooner, and this test can run quicker.
@@ -135,5 +133,34 @@ public class ShelfPodTest {
         } finally {
             shelfPod.stopBackgroundActivities();
         }
+    }
+
+    @Test public void testObservers() {
+        Temperature temperature = Temperature.Hot;
+        // Setting overflow shelf decay rate factor to 10, so the orders will expire sooner, and this test can run quicker.
+        List<Shelf> shelves = generateRegularShelfInfosAndOverflowShelfInfo(1, 2, 1);
+        ShelfPod shelfPod = new ShelfPod(shelves);
+
+        List<Order> orders = new ArrayList<>();
+        List<AddResult> addResults = new ArrayList<>();
+        IShelfPodObserver observer = new IShelfPodObserver() {
+            @Override public void postAddOrder(Order order, AddResult addResult) {
+                orders.add(order);
+                addResults.add(addResult);
+            }
+        };
+
+        // Test register observer
+        shelfPod.addObserver(observer);
+        Order expectedOrder = createOrder(temperature, 300);
+        shelfPod.addOrder(expectedOrder);
+        assertEquals(1, orders.size());
+        assertEquals(expectedOrder, orders.get(0));
+
+        // Test remove observer
+        shelfPod.removeObserver(observer);
+        expectedOrder = createOrder(temperature, 300);
+        shelfPod.addOrder(expectedOrder);
+        assertEquals(1, orders.size());
     }
 }

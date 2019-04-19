@@ -4,11 +4,8 @@ import com.cloudkitchens.fulfillment.entities.Temperature;
 import com.cloudkitchens.fulfillment.entities.orders.Order;
 import com.cloudkitchens.fulfillment.entities.orders.OrderState;
 import com.cloudkitchens.fulfillment.entities.orders.comparators.OrderExpiryComparator;
-import com.cloudkitchens.fulfillment.entities.shelves.util.ShelfUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -70,13 +67,29 @@ import java.util.stream.Collectors;
      *
      * @param shelves
      */
-    @Inject public BaseShelfPod(@Assisted List<Shelf> shelves) {
+    public BaseShelfPod(List<Shelf> shelves) {
         this.shelves = ImmutableList.copyOf(shelves);
-        this.tempShelfInfoMap = ShelfUtils.getTempShelfInfoMap(shelves);
-        this.decayRateFactors = ShelfUtils.getDecayRateFactors(shelves);
+        this.tempShelfInfoMap = getTempShelfInfoMap(shelves);
+        this.decayRateFactors = getDecayRateFactors(shelves);
         this.orderExpiryComparator = new OrderExpiryComparator(decayRateFactors);
         this.ordersQueue = new PriorityBlockingQueue<>(16, orderExpiryComparator);
         this.spaces = createSpaces(shelves);
+    }
+
+    private static Map<Temperature, Shelf> getTempShelfInfoMap(List<Shelf> shelves) {
+        Map<Temperature, Shelf> tempShelfInfoMap = new HashMap<>();
+        for (Shelf shelf : shelves) {
+            tempShelfInfoMap.put(shelf.getTemperature(), shelf);
+        }
+        return ImmutableMap.copyOf(tempShelfInfoMap);
+    }
+
+    protected static Map<Temperature, Double> getDecayRateFactors(List<Shelf> shelves) {
+        Map<Temperature, Double> spaces = new HashMap<>();
+        for (Shelf shelf : shelves) {
+            spaces.put(shelf.getTemperature(), shelf.getDecayRateFactor());
+        }
+        return ImmutableMap.copyOf(spaces);
     }
 
     private static Map<Temperature, Semaphore> createSpaces(List<Shelf> shelves) {
@@ -211,7 +224,6 @@ import java.util.stream.Collectors;
      * @return addResult, whether the add was successful or not, orderstate at the end of add operation, the shelf that was attempted for hosting the order.
      */
     @Override public AddResult addOrder(Order order) {
-        log.info("Adding order={}", order);
         AddResult addResult = addOrder(order, OrderState.Created, false);
         if (!addResult.isAdded()) {
             addResult = addOrder(order, OrderState.Created, true);
@@ -235,7 +247,6 @@ import java.util.stream.Collectors;
      * @return true if the order is successfully added into the shelf, otherwise false.
      */
     protected AddResult moveOrder(Order order) {
-        log.info("Moving order to regularShelf order={}", order);
         AddResult moveResult = addOrder(order, OrderState.StoredInOverflowShelf, false);
         log.info("Moving order to regularShelf order={} moveResult={} - done.", order, moveResult);
         return moveResult;
@@ -275,7 +286,7 @@ import java.util.stream.Collectors;
         boolean removed = removeOrderInternal(order);
         if (removed) {
             order.setOrderState(getExpiredOrderStateForShelf(getShelf(order)));
-            log.info("Expiring order, order={}", order);
+            log.info("Expired order, order={}", order);
         }
         return removed;
     }
@@ -292,7 +303,7 @@ import java.util.stream.Collectors;
     @Override public Order pollOrder() {
         while (true) {
             Order order = ordersQueue.poll();
-            log.info("Polled an order={}", order);
+            log.info("Returning an order={}", order);
             if (order == null)
                 return null;
             Temperature shelfType = getShelf(order);
@@ -302,7 +313,6 @@ import java.util.stream.Collectors;
                 continue;
             }
             order.setOrderState(getDeliveredOrderStateForShelf(shelfType));
-            log.info("Delivering order for pickup, order={}", order);
             return order;
         }
     }

@@ -16,4 +16,6 @@ public enum Temperature {
 
     public static List<Temperature> getRegularShelves() {
         return REG_SHELVES;
-    }}
+    }
+
+}

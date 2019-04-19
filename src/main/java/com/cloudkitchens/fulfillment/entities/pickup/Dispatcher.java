@@ -5,9 +5,7 @@ import com.cloudkitchens.fulfillment.entities.orders.Order;
 import com.cloudkitchens.fulfillment.entities.shelves.AddResult;
 import com.cloudkitchens.fulfillment.entities.shelves.IShelfPod;
 import com.cloudkitchens.fulfillment.entities.shelves.observers.IShelfPodObserver;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Random;
@@ -37,8 +35,7 @@ import java.util.concurrent.TimeUnit;
     private volatile ScheduledExecutorService scheduledExecutorService;
     private volatile ExecutorService executorService;
 
-    @Inject public Dispatcher(IShelfPod shelfPod, @Named("minDelayForPickupInSecs") int minDelayForPickupInSecs,
-        @Named("maxDelayForPickupInSecs") int maxDelayForPickupInSecs) {
+    public Dispatcher(IShelfPod shelfPod, int minDelayForPickupInSecs, int maxDelayForPickupInSecs) {
         this.minDelayForPickupInSecs = minDelayForPickupInSecs;
         this.maxDelayForPickupInSecs = maxDelayForPickupInSecs;
         this.shelfPod = shelfPod;
@@ -104,7 +101,7 @@ import java.util.concurrent.TimeUnit;
 
         @Override public Boolean call() {
             Order order = shelfPod.pollOrder();
-            log.info("Order picked up and the order={} ", order);
+            log.info("Picked up an order={} ", order);
             if (order != null)
                 return true;
             return false;
@@ -117,7 +114,7 @@ import java.util.concurrent.TimeUnit;
      */
     private void dispatch() {
         // The following random generates a number between 2 and 10, assumption that taxi will take about 2-10 seconds for picking up the order.
-        int delay = minDelayForPickupInSecs + random.nextInt(minDelayForPickupInSecs - maxDelayForPickupInSecs + 1);
+        int delay = minDelayForPickupInSecs + random.nextInt(maxDelayForPickupInSecs - minDelayForPickupInSecs + 1);
         scheduledExecutorService.schedule(new PickupTask(shelfPod), delay, TimeUnit.SECONDS);
         log.info("Dispatched a message for pickup.");
     }

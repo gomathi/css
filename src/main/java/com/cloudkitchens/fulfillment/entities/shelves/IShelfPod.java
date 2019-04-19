@@ -15,7 +15,8 @@ import java.util.List;
 public interface IShelfPod {
 
     /**
-     * Returns the list of
+     * Returns the list of shelves that are managed by this ShelfPod.
+     *
      * @return
      */
     List<Shelf> getShelves();

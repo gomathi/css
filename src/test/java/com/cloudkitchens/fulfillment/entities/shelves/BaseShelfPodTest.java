@@ -4,7 +4,6 @@ import com.cloudkitchens.fulfillment.entities.Temperature;
 import com.cloudkitchens.fulfillment.entities.orders.Order;
 import com.cloudkitchens.fulfillment.entities.orders.OrderState;
 import com.cloudkitchens.fulfillment.entities.orders.comparators.OrderExpiryComparator;
-import com.cloudkitchens.fulfillment.entities.shelves.util.ShelfUtils;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +28,7 @@ public class BaseShelfPodTest {
         return generateRegularShelfInfosAndOverflowShelfInfo(capacity, OVERFLOW_SHELF_DECAY_RATE_FACTOR, REGULAR_SHELF_DECAY_RATE_FACTOR);
     }
 
-    protected static List<Shelf> generateRegularShelfInfosAndOverflowShelfInfo(int capacity, int overflowShelfDecayRateFactor,
+    public static List<Shelf> generateRegularShelfInfosAndOverflowShelfInfo(int capacity, int overflowShelfDecayRateFactor,
         int regularShelfDecayRateFactor) {
         List<Shelf> shelves = new ArrayList<>();
         for (Temperature temperature : Temperature.values()) {
@@ -76,7 +75,7 @@ public class BaseShelfPodTest {
         return result;
     }
 
-    protected static Order createOrder(Temperature temperature, int shelfLifeInSecs) {
+    public static Order createOrder(Temperature temperature, int shelfLifeInSecs) {
         return createOrder(temperature, shelfLifeInSecs, DEF_DECAY_RATE_OF_ORDER);
     }
 
@@ -218,7 +217,7 @@ public class BaseShelfPodTest {
             generateOrders(ImmutableList.of(Temperature.Hot, Temperature.Cold, Temperature.Frozen, Temperature.Frozen), SHELF_CAPACITY);
 
         List<Order> expected = new ArrayList<>(generated);
-        Collections.sort(expected, new OrderExpiryComparator(ShelfUtils.getDecayRateFactors(shelves)));
+        Collections.sort(expected, new OrderExpiryComparator(BaseShelfPod.getDecayRateFactors(shelves)));
 
         for (Order order : generated)
             baseShelfPod.addOrder(order);
@@ -249,7 +248,7 @@ public class BaseShelfPodTest {
         for (Order order : expected)
             baseShelfPod.addOrder(order);
         actual = baseShelfPod.getOrders();
-        Collections.sort(expected, new OrderExpiryComparator(ShelfUtils.getDecayRateFactors(shelves)));
+        Collections.sort(expected, new OrderExpiryComparator(BaseShelfPod.getDecayRateFactors(shelves)));
         assertEquals(expected, actual);
     }
 }
