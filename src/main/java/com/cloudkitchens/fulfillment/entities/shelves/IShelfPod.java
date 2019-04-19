@@ -1,7 +1,6 @@
 package com.cloudkitchens.fulfillment.entities.shelves;
 
 import com.cloudkitchens.fulfillment.entities.orders.Order;
-import com.cloudkitchens.fulfillment.entities.orders.OrderState;
 import com.cloudkitchens.fulfillment.entities.shelves.observers.IShelfPodObserver;
 
 import java.util.List;
@@ -15,6 +14,10 @@ import java.util.List;
  */
 public interface IShelfPod {
 
+    /**
+     * Returns the list of
+     * @return
+     */
     List<Shelf> getShelves();
 
     /**
@@ -41,7 +44,19 @@ public interface IShelfPod {
      */
     List<Order> getOrders();
 
+    /**
+     * Adds an observer for which this instance will send notifications about the shelf events.
+     *
+     * @param shelfPodObserver
+     * @return
+     */
     boolean addObserver(IShelfPodObserver shelfPodObserver);
 
+    /**
+     * Removes an observer and no longer the observer will get notifications.
+     *
+     * @param shelfPodObserver
+     * @return
+     */
     boolean removeObserver(IShelfPodObserver shelfPodObserver);
 }

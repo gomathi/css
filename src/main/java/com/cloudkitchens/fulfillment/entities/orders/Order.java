@@ -8,13 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 @ThreadSafe @Slf4j public class Order {
 
     private static final Set<OrderState> END_STATES = ImmutableSet
         .of(OrderState.ExpiredInRegularShelf, OrderState.ExpiredInOverflowShelf, OrderState.ExpiredOnNoSpace, OrderState.CameExpired,
-            OrderState.PickedUpForDelivery);
+            OrderState.DeliveredFromRegularShelf, OrderState.DeliveredFromOverflowShelf);
 
     private final String name;
     private final Temperature temperature;
@@ -45,10 +46,20 @@ import java.util.concurrent.atomic.AtomicReference;
         return new Order(id, name, temperature, shelfLifeInSecs, decayRate, orderStateAtomicReference.get(), timeSpentOnOverflowShelfInMs);
     }
 
+    /**
+     * Gets the name of the order.
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the kind of the order.
+     *
+     * @return
+     */
     public Temperature getTemperature() {
         return temperature;
     }
@@ -63,6 +74,11 @@ import java.util.concurrent.atomic.AtomicReference;
     }
 
 
+    /**
+     * Each order has an associated decayRate which controls the shelf life in a shelf.
+     *
+     * @return
+     */
     public double getDecayRate() {
         return decayRate;
     }
@@ -99,8 +115,9 @@ import java.util.concurrent.atomic.AtomicReference;
      */
     public long getCurrShelfValueInMs(double decayRateFactor) {
         long orderAgeInMs = System.currentTimeMillis() - createdTimestampInMs;
-        double value = (shelfLifeInSecs * 1000 - orderAgeInMs) - (decayRate * decayRateFactor * orderAgeInMs);
-        return new Double(value).longValue();
+        long decayedOrderAgeInMs = new Double(decayRate * decayRateFactor * orderAgeInMs).longValue();
+        long shelfValue = (shelfLifeInSecs * 1000 - orderAgeInMs) - decayedOrderAgeInMs;
+        return shelfValue;
     }
 
     /**
@@ -167,6 +184,7 @@ import java.util.concurrent.atomic.AtomicReference;
     }
 
     public String toString() {
-        return MoreObjects.toStringHelper(Order.class).add("orderId", id).toString();
+        return MoreObjects.toStringHelper(Order.class).add("orderId", id).add("name", name).add("temperature", temperature)
+            .add("shelfLifeInSecs", shelfLifeInSecs).add("decayRate", decayRate).add("orderState", getOrderState()).toString();
     }
 }

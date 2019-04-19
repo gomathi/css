@@ -17,6 +17,12 @@ import javax.annotation.concurrent.ThreadSafe;
         this.shelf = shelf;
     }
 
+    /**
+     * Returns true if the order is successfully added to regular shelf/overflow shelf.
+     * Otherwise returns false.
+     *
+     * @return
+     */
     public boolean isAdded() {
         return added;
     }

@@ -18,16 +18,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
     public static final long WAIT_TIME_TO_SHUTDOWN_MS = 120 * 1000; // In milliseconds
 
-    private static final ExecutorService EXECUTOR_SERVICE;
-
-    static {
-        EXECUTOR_SERVICE = createFixedThreadPool("shared-executors-", 20, WAIT_TIME_TO_SHUTDOWN_MS);
-    }
-
-    public static ExecutorService getSharedExecutorService() {
-        return EXECUTOR_SERVICE;
-    }
-
     private static ThreadFactory getThreadFactory(String prefix) {
         return new ThreadFactory() {
             private AtomicLong count = new AtomicLong();

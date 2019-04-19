@@ -7,44 +7,62 @@ import com.cloudkitchens.fulfillment.entities.shelves.IShelfPod;
 import com.cloudkitchens.fulfillment.entities.shelves.observers.IShelfPodObserver;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This class listens to ShelfPod's addOrder events, and dispatches a message to drive for order pickup.
- * Since we dont have any real integration with taxi service, this class will submit a task with scheduled delay of 2-10 seconds
- * (mimicking that in realtime it may take that many seconds to pickup the order).
+ * This class listens to ShelfPod's addOrder events, and dispatches a message for order pickup.
+ * Since we dont have any real integration with cab service, this class will submit a task with scheduled delay of 2-10 seconds
+ * which pickups order from the shelf (mimicking that in realtime it may take that many seconds to pickup the order).
  */
 @Slf4j @Singleton public class Dispatcher implements IShelfPodObserver {
 
-    private static final int MIN_DELAY_FOR_PICKUP_IN_SECS = 2;
-    private static final int MAX_DELAY_FOR_PICKUP_IN_SECS = 10;
-    private static final String THREAD_NAME_PREFIX = "dispatcher-threads";
+    private static final String PICKUP_THREAD_NAME_PREFIX = "pickup-threads-";
+    private static final String PICKUP_RESULTS_READER_THREAD_NAME_PRE = "pickup-results-reader-";
     private static final int THREAD_COUNT = 30;
-
     private final Random random = new Random();
-    private final IShelfPod shelfPod;
-    private final ExecutorCompletionService<Boolean> completionService;
-    private final ScheduledExecutorService scheduledExecutorService;
 
-    @Inject public Dispatcher(IShelfPod shelfPod) {
+    private final int minDelayForPickupInSecs, maxDelayForPickupInSecs;
+    private final IShelfPod shelfPod;
+    private volatile ExecutorCompletionService<Boolean> completionService;
+    private volatile ScheduledExecutorService scheduledExecutorService;
+    private volatile ExecutorService executorService;
+
+    @Inject public Dispatcher(IShelfPod shelfPod, @Named("minDelayForPickupInSecs") int minDelayForPickupInSecs,
+        @Named("maxDelayForPickupInSecs") int maxDelayForPickupInSecs) {
+        this.minDelayForPickupInSecs = minDelayForPickupInSecs;
+        this.maxDelayForPickupInSecs = maxDelayForPickupInSecs;
         this.shelfPod = shelfPod;
-        this.scheduledExecutorService =
-            ExecutorServicesUtil.createScheduledThreadPool(THREAD_NAME_PREFIX, THREAD_COUNT, ExecutorServicesUtil.WAIT_TIME_TO_SHUTDOWN_MS);
-        this.completionService = new ExecutorCompletionService<>(scheduledExecutorService);
+
     }
 
     public void startBackgroundActivities() {
+        this.scheduledExecutorService = ExecutorServicesUtil
+            .createScheduledThreadPool(PICKUP_THREAD_NAME_PREFIX, THREAD_COUNT, ExecutorServicesUtil.WAIT_TIME_TO_SHUTDOWN_MS);
+        this.executorService = ExecutorServicesUtil
+            .createScheduledThreadPool(PICKUP_RESULTS_READER_THREAD_NAME_PRE, 1, ExecutorServicesUtil.WAIT_TIME_TO_SHUTDOWN_MS);
+
+        this.completionService = new ExecutorCompletionService<>(scheduledExecutorService);
+
         shelfPod.addObserver(this);
-        ExecutorServicesUtil.getSharedExecutorService().submit(new PickupTaskResultsReader(completionService));
+        executorService.submit(new PickupTaskResultsReader(completionService));
         log.info("Started background activities - done.");
+    }
+
+    public void stopBackgroundActivities() {
+        if (executorService != null)
+            executorService.shutdownNow();
+        if (scheduledExecutorService != null)
+            scheduledExecutorService.shutdownNow();
     }
 
     /**
@@ -86,7 +104,7 @@ import java.util.concurrent.TimeUnit;
 
         @Override public Boolean call() {
             Order order = shelfPod.pollOrder();
-            log.info("Order picked up orderId = {} ", (order == null) ? null : order.getId());
+            log.info("Order picked up and the order={} ", order);
             if (order != null)
                 return true;
             return false;
@@ -99,7 +117,7 @@ import java.util.concurrent.TimeUnit;
      */
     private void dispatch() {
         // The following random generates a number between 2 and 10, assumption that taxi will take about 2-10 seconds for picking up the order.
-        int delay = MIN_DELAY_FOR_PICKUP_IN_SECS + random.nextInt(MAX_DELAY_FOR_PICKUP_IN_SECS - MIN_DELAY_FOR_PICKUP_IN_SECS + 1);
+        int delay = minDelayForPickupInSecs + random.nextInt(minDelayForPickupInSecs - maxDelayForPickupInSecs + 1);
         scheduledExecutorService.schedule(new PickupTask(shelfPod), delay, TimeUnit.SECONDS);
         log.info("Dispatched a message for pickup.");
     }

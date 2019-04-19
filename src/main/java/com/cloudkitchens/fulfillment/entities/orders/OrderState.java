@@ -10,7 +10,7 @@ package com.cloudkitchens.fulfillment.entities.orders;
  * (1) Created
  * (2) Stored -> {2.1 StoredInRegularShelf, 2.2 StoredInOverflowShelf}
  * (3) Expired -> {ExpiredInRegularShelf, ExpiredInOverflowShelf, ExpiredOnNoSpace, CameExpired}
- * (4) PickedUp -> {PickedUpForDelivery}
+ * (4) Delivered -> {DeliveredFromRegularShelf, DeliveredFromOverflowShelf}
  * <p>
  * Following state movements are only allowed
  * <p>
@@ -36,4 +36,4 @@ package com.cloudkitchens.fulfillment.entities.orders;
  * an order from Overflow shelf to Regular shelf, the order may be delivered by another thread from Overflow shelf.
  * Hence using these states, mover thread/delivery thread can resolve any potential race conditions.
  */
-public enum OrderState {Created, StoredInRegularShelf, StoredInOverflowShelf, ExpiredInRegularShelf, ExpiredInOverflowShelf, ExpiredOnNoSpace, CameExpired, PickedUpForDelivery}
+public enum OrderState {Created, StoredInRegularShelf, StoredInOverflowShelf, ExpiredInRegularShelf, ExpiredInOverflowShelf, ExpiredOnNoSpace, CameExpired, DeliveredFromRegularShelf, DeliveredFromOverflowShelf}

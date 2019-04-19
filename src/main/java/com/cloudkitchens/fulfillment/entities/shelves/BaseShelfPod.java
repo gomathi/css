@@ -4,7 +4,6 @@ import com.cloudkitchens.fulfillment.entities.Temperature;
 import com.cloudkitchens.fulfillment.entities.orders.Order;
 import com.cloudkitchens.fulfillment.entities.orders.OrderState;
 import com.cloudkitchens.fulfillment.entities.orders.comparators.OrderExpiryComparator;
-import com.cloudkitchens.fulfillment.entities.shelves.observers.IShelfPodObserver;
 import com.cloudkitchens.fulfillment.entities.shelves.util.ShelfUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -14,13 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.Semaphore;
@@ -28,8 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of IShelfPod, this manages group of shelves. If there is an overflow shelf, that will be used for
- * regular shelves in case if the regular shelves dont have any space to store an order.
+ * Implementation of IShelfPod, this manages group of shelves. Overflow shelf is used in case if the regular shelves dont have any space to store an order.
  * <p>
  * In case if CloudKitchens is growing much fast, we can spawn multiple instances of this class and handle load balancing
  * across multiple {@link IShelfPod}
@@ -54,25 +50,26 @@ import java.util.stream.Collectors;
  * which will expire sooner across multiple shelves.
  */
 
-@Slf4j @ThreadSafe public class BaseShelfPod implements IShelfPod {
-
-    private static final Map<Temperature, Map<ShelfOrderState, OrderState>> STORED_AND_EXPIRED_ORDER_STATE_NAMES =
-        getStoredAndExpiredOrderStateNames();
+@Slf4j @ThreadSafe public abstract class BaseShelfPod implements IShelfPod {
 
     private final List<Shelf> shelves;
     private final Map<Temperature, Shelf> tempShelfInfoMap;
-    private final Map<Temperature, Double> decayRateFactors;
+    protected final Map<Temperature, Double> decayRateFactors;
     private final Comparator<Order> orderExpiryComparator;
-
     /**
      * Java doesn't have any bounded threadsafe priority queue. Given that the shelf size is finite, we want to have bounded priority queue.
      * So using semaphores to add max bound to priority queue. Any addition/removal operations to the queue should have corresponding
      * acquire/release semaphore operations respectively.
      */
     private final BlockingQueue<Order> ordersQueue;
-    // A semaphore is associated with different kinds of shelves. Any order addition/removal from the shelf is controlled through these semaphores.
+    // A semaphore is associated with each shelf. Any order addition/removal from shelves is controlled through these semaphores.
     private final Map<Temperature, Semaphore> spaces;
 
+    /**
+     * Initializes ShelfPod with the given list of shelves. The given list should contain one shelf per {@link Temperature}.
+     *
+     * @param shelves
+     */
     @Inject public BaseShelfPod(@Assisted List<Shelf> shelves) {
         this.shelves = ImmutableList.copyOf(shelves);
         this.tempShelfInfoMap = ShelfUtils.getTempShelfInfoMap(shelves);
@@ -101,7 +98,7 @@ import java.util.stream.Collectors;
     }
 
     /**
-     * Returns one of the shelf types of value {@link Temperature}  given the order.
+     * Returns shelf where the order is currently stored.
      * <p>
      * An order's state can be only {@link OrderState#StoredInRegularShelf} or {@link OrderState#StoredInOverflowShelf}
      * if its stored in one of the shelves. An order's state should be one of the above before adding an order into the shelf.
@@ -114,59 +111,28 @@ import java.util.stream.Collectors;
      * @throws IllegalStateException if the order's {@link OrderState} is not in
      *                               {{@link OrderState#StoredInRegularShelf}, {@link OrderState#StoredInOverflowShelf}}
      */
-    private static Temperature getShelfTypeWhileInsideShelf(Order order) {
+    protected static Temperature getShelf(Order order) {
         if (order.getOrderState() == OrderState.StoredInRegularShelf)
             return order.getTemperature();
         else if (order.getOrderState() == OrderState.StoredInOverflowShelf)
             return Temperature.Overflow;
-        throw new IllegalStateException("Given order's state is not in a valid condition.");
+        throw new IllegalStateException("Given orderId:" + order.getId() + " is not currently stored in any of the shelves.");
     }
 
     @Override public List<Shelf> getShelves() {
         return shelves;
     }
 
-    /**
-     * An order when its stored it may be stored in regular shelf or overflow shelf. Also it could be expired from regular shelf or overflow shelf.
-     * Recording this like {@link OrderState#StoredInRegularShelf}, @link OrderState#ExpiredInRegularShelf} will help analyzing the orders and
-     * shelves in the future.
-     * <p>
-     * This function prepares a map containing those states for different shelves for lookup purposes.
-     *
-     * @return
-     */
-    private static Map<Temperature, Map<ShelfOrderState, OrderState>> getStoredAndExpiredOrderStateNames() {
-        Map<Temperature, Map<ShelfOrderState, OrderState>> storedAndExpiredOrderStateNames = new HashMap<>();
-        Set<Temperature> regularShelves =
-            Arrays.asList(Temperature.values()).stream().filter(temp -> temp != Temperature.Overflow).collect(Collectors.toSet());
-        for (Temperature temperature : Temperature.values()) {
-            Map<ShelfOrderState, OrderState> shelfMap = new HashMap<>();
-            for (ShelfOrderState shelfOrderState : ShelfOrderState.values()) {
-                if (regularShelves.contains(temperature)) {
-                    shelfMap.put(shelfOrderState,
-                        shelfOrderState == ShelfOrderState.Stored ? OrderState.StoredInRegularShelf : OrderState.ExpiredInRegularShelf);
-                } else {
-                    shelfMap.put(shelfOrderState,
-                        shelfOrderState == ShelfOrderState.Stored ? OrderState.StoredInOverflowShelf : OrderState.ExpiredInOverflowShelf);
-                }
-            }
-            storedAndExpiredOrderStateNames.put(temperature, ImmutableMap.copyOf(shelfMap));
-        }
-        return ImmutableMap.copyOf(storedAndExpiredOrderStateNames);
+    protected static OrderState getStoredOrderStateForShelfType(Temperature shelfType) {
+        return shelfType == Temperature.Overflow ? OrderState.StoredInOverflowShelf : OrderState.StoredInRegularShelf;
     }
 
-    /**
-     * Returns one of the following values from [{@link OrderState#StoredInRegularShelf},{@link OrderState#StoredInOverflowShelf},
-     * {@link OrderState#ExpiredInRegularShelf}, {@link OrderState#ExpiredInOverflowShelf}] based on the parameters.
-     * <p>
-     * The returned value is used to track from where the items are expired, or which shelf is used for storing most often.
-     *
-     * @param shelfType
-     * @param shelfOrderState
-     * @return
-     */
-    private OrderState getOrderState(Temperature shelfType, ShelfOrderState shelfOrderState) {
-        return STORED_AND_EXPIRED_ORDER_STATE_NAMES.get(shelfType).get(shelfOrderState);
+    protected static OrderState getExpiredOrderStateForShelf(Temperature shelfType) {
+        return shelfType == Temperature.Overflow ? OrderState.ExpiredInOverflowShelf : OrderState.ExpiredInRegularShelf;
+    }
+
+    protected static OrderState getDeliveredOrderStateForShelf(Temperature shelfType) {
+        return shelfType == Temperature.Overflow ? OrderState.DeliveredFromOverflowShelf : OrderState.DeliveredFromRegularShelf;
     }
 
     /**
@@ -194,6 +160,7 @@ import java.util.stream.Collectors;
                 order.setOrderState(OrderState.CameExpired);
             } else {
                 if (prevState == OrderState.StoredInOverflowShelf) {
+                    // If prevState is in Overflow shelf, then this is move request. So lets wait indefinitely until we get a space on the regular shelf.
                     shelfSpaces.acquire();
                     spaceAcquired = true;
                 } else {
@@ -203,7 +170,7 @@ import java.util.stream.Collectors;
                 }
                 if (spaceAcquired) {
                     boolean removedInOverflow = (prevState == OrderState.StoredInOverflowShelf) ? removeOrder(order) : true;
-                    if (removedInOverflow && order.compareAndSet(prevState, getOrderState(shelfType, ShelfOrderState.Stored))) {
+                    if (removedInOverflow && order.compareAndSet(prevState, getStoredOrderStateForShelfType(shelfType))) {
                         if (prevState == OrderState.StoredInOverflowShelf) {
                             // If an order stayed in overflow shelf, then we need to record it as in the overflow shelf
                             // orders decay faster, we need to account that for expiry time calculation in regular shelf.
@@ -244,12 +211,12 @@ import java.util.stream.Collectors;
      * @return addResult, whether the add was successful or not, orderstate at the end of add operation, the shelf that was attempted for hosting the order.
      */
     @Override public AddResult addOrder(Order order) {
-        log.info("Adding orderId={}", order.getId());
+        log.info("Adding order={}", order);
         AddResult addResult = addOrder(order, OrderState.Created, false);
         if (!addResult.isAdded()) {
             addResult = addOrder(order, OrderState.Created, true);
         }
-        log.info("Adding orderId={} addResult={} - done.", order.getId(), addResult);
+        log.info("Adding order={} addResult={} - done.", order, addResult);
         return addResult;
     }
 
@@ -268,22 +235,47 @@ import java.util.stream.Collectors;
      * @return true if the order is successfully added into the shelf, otherwise false.
      */
     protected AddResult moveOrder(Order order) {
-        log.info("Moving order to orderId={}", order.getId());
+        log.info("Moving order to regularShelf order={}", order);
         AddResult moveResult = addOrder(order, OrderState.StoredInOverflowShelf, false);
-        log.info("Moving order to orderId={} moveResult={} - done.", order.getId(), moveResult);
+        log.info("Moving order to regularShelf order={} moveResult={} - done.", order, moveResult);
         return moveResult;
     }
 
     /**
+     * Removes given order from the shelf. If removed successfully, then releases the corresponding allocated space.
+     *
      * @param order
      * @return
      */
     protected boolean removeOrder(Order order) {
+        boolean removed = removeOrderInternal(order);
+        if (removed) {
+            log.info("Removed order, and order={}", order);
+        }
+        return removed;
+    }
+
+    private boolean removeOrderInternal(Order order) {
         boolean removed = ordersQueue.remove(order);
         if (removed) {
-            Temperature shelfType = getShelfTypeWhileInsideShelf(order);
+            Temperature shelfType = getShelf(order);
             spaces.get(shelfType).release();
-            log.info("Removed order, and orderId={}", order.getId());
+        }
+        return removed;
+    }
+
+    /**
+     * Removes given order from the shelf. If removed successfully, then releases the corresponding semaphore and
+     * marks the item as expired.
+     *
+     * @param order
+     * @return
+     */
+    protected boolean expireOrder(Order order) {
+        boolean removed = removeOrderInternal(order);
+        if (removed) {
+            order.setOrderState(getExpiredOrderStateForShelf(getShelf(order)));
+            log.info("Expiring order, order={}", order);
         }
         return removed;
     }
@@ -292,21 +284,25 @@ import java.util.stream.Collectors;
      * This function returns an order for a pickup service to deliver it. An order can expire while on the shelf,
      * so this function makes sure the order is valid before returning it to the caller.
      * <p>
+     * <p>
+     * Running time complexity is O(1)
      *
      * @return an order if the order is available on the shelf and is not expired, otherwise null.
      */
     @Override public Order pollOrder() {
         while (true) {
             Order order = ordersQueue.poll();
+            log.info("Polled an order={}", order);
             if (order == null)
                 return null;
-            Temperature shelfType = getShelfTypeWhileInsideShelf(order);
+            Temperature shelfType = getShelf(order);
             spaces.get(shelfType).release();
             if (order.hasExpired(getDecayRate(order))) {
-                order.setOrderState(getOrderState(shelfType, ShelfOrderState.Expired));
+                order.setOrderState(getExpiredOrderStateForShelf(shelfType));
                 continue;
             }
-            order.setOrderState(OrderState.PickedUpForDelivery);
+            order.setOrderState(getDeliveredOrderStateForShelf(shelfType));
+            log.info("Delivering order for pickup, order={}", order);
             return order;
         }
     }
@@ -320,17 +316,9 @@ import java.util.stream.Collectors;
         List<Order> orders = new ArrayList<>(ordersQueue);
         // Since the queue provides weak iterator, we may have got orders which were already delivered, or expired.
         // So we make a copy and filter only the orders that are currently in the shelf.
-        orders = orders.stream().map(order -> ((Order) order).getDeepCopy()).filter(order -> order.isCurrentlyInAnyShelf())
-            .collect(Collectors.toList());
+        orders =
+            orders.stream().map(order -> order.getDeepCopy()).filter(order -> order.isCurrentlyInAnyShelf()).collect(Collectors.toList());
         Collections.sort(orders, orderExpiryComparator);
         return orders;
-    }
-
-    @Override public boolean addObserver(IShelfPodObserver shelfPodObserver) {
-        return false;
-    }
-
-    @Override public boolean removeObserver(IShelfPodObserver shelfPodObserver) {
-        return false;
     }
 }
