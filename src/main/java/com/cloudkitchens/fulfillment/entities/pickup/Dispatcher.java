@@ -81,7 +81,7 @@ import java.util.concurrent.TimeUnit;
                     Future<Boolean> result = completionService.take();
                     log.info("Pickup task completed, isSuccessful={}", result.get());
                 } catch (InterruptedException e) {
-                    log.warn("Got interrupted while waiting for the results from completion service. Quitting the thread.");
+                    //If the thread is interrupted, lets not proceed further this task.
                     return;
                 } catch (ExecutionException e) {
                     log.error("Exception occurred while reading the results from future. Continuing with the nex result.", e);

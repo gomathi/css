@@ -42,19 +42,53 @@ import java.util.UUID;
     private static final Map<String, Temperature> STR_VALUES_TO_TEMPERATURE =
         ImmutableMap.of("hot", Temperature.Hot, "cold", Temperature.Cold, "frozen", Temperature.Frozen, "overflow", Temperature.Overflow);
 
+    /**
+     * Pass configFile and ordersFile using JVM parameters, and this will run the daemons using those configs.
+     * <p>
+     * Example: -DconfigFile=/workplace/projects/css/src/main/resources/daemons_config.json -DordersFile=/workplace/projects/css-data/Engineering_Challenge_-_Orders.json
+     *
+     * @param args
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws URISyntaxException
+     */
     public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
-        URL configResourceURL = FulfillmentDaemons.class.getClassLoader().getResource("daemons_config.json");
-        File configFile = Paths.get(configResourceURL.toURI()).toFile();
-        String configFileAbsolutePath = configFile.getAbsolutePath();
+        String configFileAbsolutePath = null;
+        if (!System.getProperties().containsKey("configFile")) {
+            URL configResourceURL = FulfillmentDaemons.class.getClassLoader().getResource("daemons_config.json");
+            File configFile = Paths.get(configResourceURL.toURI()).toFile();
+            configFileAbsolutePath = configFile.getAbsolutePath();
+        } else {
+            configFileAbsolutePath = System.getProperty("configFile");
+        }
 
-        launchFulfillmentDaemons(configFileAbsolutePath, "/workplace/projects/css-data/Engineering_Challenge_-_Orders.json");
+        if (!System.getProperties().containsKey("ordersFile")) {
+            log.error("ordersFile is not passed as an argument for JVM properties. Quitting the daemons.");
+            System.exit(-1);
+        }
+        String ordersFilePath = System.getProperty("ordersFile");
+        log.info("Launching daemons with configFile={} and ordersFile={}", configFileAbsolutePath, ordersFilePath);
+        launchFulfillmentDaemons(configFileAbsolutePath, ordersFilePath);
+        log.info("Daemons added orders to shelf, and delivered them.");
+        //If you want to see how the orders handled by the fulfillment service then run the following command
+        //grep orderInfo /tmp/css.log | awk -F' - ' '{print $2}' | awk -F'{' '{print $2}' | awk -F'}' '{print $1}' > /tmp/orders.csv
+        System.exit(0); // 0 indicating normal exit.
     }
 
+    /**
+     * Builds ShelfPod and Dispatcher, and adds orders, and waits for sometime for the delivery to pickup the orders, and quits.
+     *
+     * @param daemonsConfigFilePath
+     * @param ordersFilePath
+     * @throws FileNotFoundException
+     * @throws InterruptedException
+     */
     public static void launchFulfillmentDaemons(String daemonsConfigFilePath, String ordersFilePath)
         throws FileNotFoundException, InterruptedException {
         Config config = createConfig(daemonsConfigFilePath);
 
-        log.info("Configurations ");
+        log.info("Configurations poissonMeanPerSec={}, minDelayForPickupInSecs, maxDelayForPickupInSecs={}",
+            config.getPoissonMeanPerSecond(), config.getMinDelayForPickupInSecs(), config.getMaxDelayForPickupInSecs());
 
         List<Shelf> shelves = createShelves(config.getShelfInputs());
         for (Shelf shelf : shelves) {
@@ -69,9 +103,17 @@ import java.util.UUID;
         List<OrderInput> orderInputs = getOrders(ordersFilePath);
         Iterator<OrderInput> inputItr = orderInputs.iterator();
         addOrdersToShelfPodUsingWithPoissonDistribution(config, inputItr, shelfPod, dispatcher);
-        System.exit(1);
     }
 
+    /**
+     * Adds orders to the shelf following poisson distribution.
+     *
+     * @param config
+     * @param inputItr
+     * @param shelfPod
+     * @param dispatcher
+     * @throws InterruptedException
+     */
     private static void addOrdersToShelfPodUsingWithPoissonDistribution(Config config, Iterator<OrderInput> inputItr, ShelfPod shelfPod,
         Dispatcher dispatcher) throws InterruptedException {
         PoissonDistribution pd = new PoissonDistribution(config.getPoissonMeanPerSecond());
@@ -113,6 +155,7 @@ import java.util.UUID;
      * @param orders
      */
     private static void logOrders(List<Order> orders) {
+        log.info("All the orders status is as following at the end of adding and delivery.");
         for (Order order : orders)
             log.info("orderInfo={}", order);
     }

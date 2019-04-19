@@ -195,7 +195,8 @@ import java.util.concurrent.PriorityBlockingQueue;
                     updateMoverThreadQueue(orderAndShelfOperation);
                     updateExpireThreadQueue(orderAndShelfOperation);
                 } catch (InterruptedException e) {
-                    log.warn("Current thread is interrupted. Stopping mover thread activities further.", e);
+                    //If the thread is interrupted, lets not proceed further this task.
+                    return;
                 }
             }
         }
@@ -285,7 +286,7 @@ import java.util.concurrent.PriorityBlockingQueue;
                         }
                     }
                 } catch (InterruptedException e) {
-                    log.warn("Current thread is interrupted. Stopping mover thread activities further.", e);
+                    //If the thread is interrupted, lets not proceed further this task.
                     return;
                 }
             }
@@ -313,7 +314,7 @@ import java.util.concurrent.PriorityBlockingQueue;
                         }
                     }
                 } catch (InterruptedException e) {
-                    log.warn("Interrupted while trying to take an item from the queue. Stopping further thread activities.", e);
+                    //If the thread is interrupted, lets not proceed further this task.
                     return;
                 }
             }
