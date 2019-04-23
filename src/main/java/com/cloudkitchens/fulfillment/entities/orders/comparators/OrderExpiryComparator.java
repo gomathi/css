@@ -1,6 +1,6 @@
 package com.cloudkitchens.fulfillment.entities.orders.comparators;
 
-import com.cloudkitchens.fulfillment.entities.Temp;
+import com.cloudkitchens.fulfillment.entities.Temperature;
 import com.cloudkitchens.fulfillment.entities.orders.Order;
 import com.cloudkitchens.fulfillment.entities.orders.OrderState;
 
@@ -16,15 +16,15 @@ import java.util.Map;
  * <p>
  * This comparator takes {@link #decayRateFactors} which is used for determining expiry time. As an order's expiration timestamp changes
  * depending upon the shelf where it is stored, decayRateFactor is used as parameter which can be provided dynamically by shelves.
- * As decayRateFactor is provided by the ShelfPod, this compare function can't be implemented as Comparable in Order class.
+ * As decayRateFactor is provided by the IShelfPod, this compare function can't be implemented as Comparable in hOrder class.
  * <p>
  * This comparator is used in sorting orders for maintaining the orders in a priority queue(so that soon to be
- * expired order can be given to PickupService) and displaying purposes as well.
+ * expired order can be given to Dispatcher) and displaying purposes as well.
  */
 public class OrderExpiryComparator implements Comparator<Order> {
-    private final Map<Temp, Double> decayRateFactors;
+    private final Map<Temperature, Double> decayRateFactors;
 
-    public OrderExpiryComparator(Map<Temp, Double> decayRateFactors) {
+    public OrderExpiryComparator(Map<Temperature, Double> decayRateFactors) {
         this.decayRateFactors = decayRateFactors;
     }
 
@@ -41,7 +41,7 @@ public class OrderExpiryComparator implements Comparator<Order> {
 
     private double getDecayRate(Order order) {
         return order.getOrderState() == OrderState.StoredInOverflowShelf ?
-            decayRateFactors.get(Temp.Overflow) :
-            decayRateFactors.get(order.getTemp());
+            decayRateFactors.get(Temperature.Overflow) :
+            decayRateFactors.get(order.getTemperature());
     }
 }

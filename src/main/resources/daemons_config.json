@@ -1,0 +1,27 @@
+{
+  "shelves": [
+    {
+      "capacity": 15,
+      "temperature": "hot",
+      "decayRateFactor": 1
+    },
+    {
+      "capacity": 15,
+      "temperature": "cold",
+      "decayRateFactor": 1
+    },
+    {
+      "capacity": 15,
+      "temperature": "frozen",
+      "decayRateFactor": 1
+    },
+    {
+      "capacity": 20,
+      "temperature": "overflow",
+      "decayRateFactor": 2
+    }
+  ],
+  "poissonMeanPerSecond": 3.25,
+  "minDelayForPickupInSecs": 2,
+  "maxDelayForPickupInSecs": 10
+}
