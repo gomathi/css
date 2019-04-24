@@ -44,7 +44,17 @@ How I achieved the goal
 
 3. The shelves need to be cleaned as soon as the orders expire. This becomes critical in case of pickup service's delay. In such cases, if the orders are not removed from regular shelves, then overflow shelf can't move the orders back to regular shelves, and the orders in the overflow shelf also will get expired, also any new orders that are coming to a regular shelf which is full will get expired even before it gets a space on the shelf. Here DelayQueue is used for removing expired orders. In a DelayQueue you can remove an order only if its expired. All updates that are happening on the main queue are updated on the delay queue as well. So delay queue will contain only orders which need to be tracked for expiry, and a thread blocks on this delay queue, and if it can remove an order from the delay queue, then it will mark the order as expired. 
 
-4. Additionally any addition to the fulfillment service is executed in O(log n) time and removal of an order for pickup happens in O(1) time. So this complexity is better in case if the shelf capacities increases in future. Space wise I am using additionally 1.25x of the capacity of all shelves only. The background threads may get into performing some linear time operations like removing an order for expiry, and moving an order, but they don't impact any online operations. Additionally if pickup service is maintaining the SLAs in delivering an order from the shelf, then these threads wont have to perform many operations. So in that case, these background threads will have less load on the system.
+4. Additionally any addition to the fulfillment service is executed in O(log n) time and removal of an order for pickup happens in O(log n) time. So this complexity is better in case if the shelf capacities increases in future. Space wise I am using additionally 1.25x of the capacity of all shelves only. The background threads may get into performing some linear time operations like removing an order for expiry, and moving an order, but they don't impact any online operations. Additionally if pickup service is maintaining the SLAs in delivering an order from the shelf, then these threads wont have to perform many operations. So in that case, these background threads will have less load on the system.
 
+Improvements needed
+-------------------
 
+1. Run grammatical error mistakes finding software(like grammarly) on all the code's comments, and fix it.
+2. Remove all logs that look like debug statements.(Remove all logs basically, if there are any production issues, run the code actively to figure out the issue, you can't use logs to figure out the issue.)
+3. Use lombok consistently across all codebase. There are places where equals and hashcode are not used from lombok framework.
+4. Pod and Daemons names are not suitable. Remove all the names that look weird. Check with code reviewer what names he thinks is suitable and use it. You dont have freedom to use any English words.
+5. Add method in ShelfPod to return the orders sorted by shelves. 
+6. Remove IShelfPod, ShelfPod, and BaseShelfPod classes, and merge into one class. It does not matter even if a class contains 10k lines, its better to have a single class, than multiple classes. 
+
+The above code review came from a code reviewers(not me!). So please add above changes if you want to get ship it!(if you know what I am saying) on the PR. 
 
