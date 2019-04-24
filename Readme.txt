@@ -15,7 +15,7 @@ Running the code
 ----------------
 (assuming css.zip is extracted under /workplace)
 
-java -DconfigFile=/workplace/css/daemons_config.json -DordersFile=/workplace/css/Engineering_Challenge_-_Orders.json -jar /workplace/css/css.jar 2>&1 | tee /tmp/css.log
+java -DconfigFile=/workplace/css/daemons_config.json -DordersFile=/workplace/css/orders.json -jar /workplace/css/css.jar 2>&1 | tee /tmp/css.log
 
 The log provides more detailed information about how the fulfillment service performed during its execution.
 
