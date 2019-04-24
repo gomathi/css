@@ -1,0 +1,133 @@
+,,,,,
+orderId=26c3200c-49f3-4866-a4de-ba7443938751, name=McFlury, temperature=Frozen,shelfLifeInSecs=375,decayRate=0.4, orderState=DeliveredFromRegularShelf
+orderId=4b9af755-19c0-4e20-a87d-a8800085cfee, name=Acai Bowl, temperature=Cold,shelfLifeInSecs=249,decayRate=0.3, orderState=DeliveredFromRegularShelf
+orderId=8af053ef-8cde-494b-bda3-44f065c394a2, name=Yogurt, temperature=Cold,shelfLifeInSecs=263,decayRate=0.37, orderState=DeliveredFromRegularShelf
+orderId=c2a8604c-cbc5-4de9-a956-1c688c307777, name=Chocolate Gelato, temperature=Frozen,shelfLifeInSecs=300,decayRate=0.61, orderState=DeliveredFromRegularShelf
+orderId=60a014ba-0709-42cd-a405-cfb64025ab63, name=Cobb Salad, temperature=Cold,shelfLifeInSecs=269,decayRate=0.19, orderState=DeliveredFromRegularShelf
+orderId=488fe216-7ffa-4021-9105-b59f3f429cf5, name=Cottage Cheese, temperature=Cold,shelfLifeInSecs=251,decayRate=0.22, orderState=DeliveredFromRegularShelf
+orderId=51e38f2b-d6a5-4b7f-9eb8-bbc2a27146e6, name=Coke, temperature=Cold,shelfLifeInSecs=240,decayRate=0.25, orderState=DeliveredFromRegularShelf
+orderId=1f413448-9b8f-4eb7-b34d-cfb1e4c94405, name=Snow Cone, temperature=Frozen,shelfLifeInSecs=50,decayRate=0.86, orderState=DeliveredFromRegularShelf
+orderId=817b30cf-3eb6-483b-8963-b097825d4fbb, name=Pad See Ew, temperature=Hot,shelfLifeInSecs=210,decayRate=0.72, orderState=DeliveredFromRegularShelf
+orderId=34de06b3-bcf4-4034-9fb9-e4e396bf7125, name=Chunky Monkey, temperature=Frozen,shelfLifeInSecs=210,decayRate=0.54, orderState=DeliveredFromRegularShelf
+orderId=18522405-e68b-45ba-8b7a-79a93559917d, name=Beef Stew, temperature=Hot,shelfLifeInSecs=206,decayRate=0.69, orderState=DeliveredFromRegularShelf
+orderId=1de6ec3c-c82a-45b0-a05a-42eaa55366d0, name=Cheese, temperature=Cold,shelfLifeInSecs=255,decayRate=0.2, orderState=DeliveredFromRegularShelf
+orderId=4e7b9fdb-a992-452a-a146-d2a5d136cc04, name=Spinach Omelet, temperature=Hot,shelfLifeInSecs=230,decayRate=0.63, orderState=DeliveredFromRegularShelf
+orderId=4640a03f-f41b-4628-9028-684664e669c2, name=Beef Hash, temperature=Hot,shelfLifeInSecs=30,decayRate=0.74, orderState=DeliveredFromRegularShelf
+orderId=8f474965-42ea-46f9-b914-1dacaff8d3db, name=Pork Chop, temperature=Hot,shelfLifeInSecs=200,decayRate=0.7, orderState=DeliveredFromRegularShelf
+orderId=f111ba4f-ee61-4328-a82f-bcaa8b3d5e1d, name=Kale Salad, temperature=Cold,shelfLifeInSecs=250,decayRate=0.25, orderState=DeliveredFromRegularShelf
+orderId=17830dbc-92c9-4b66-b5e2-b4d533cac39d, name=Fresh Fruit, temperature=Cold,shelfLifeInSecs=252,decayRate=0.29, orderState=DeliveredFromRegularShelf
+orderId=7680e620-07f1-4904-b283-7495cdba68fd, name=Cranberry Salad, temperature=Cold,shelfLifeInSecs=245,decayRate=0.21, orderState=DeliveredFromRegularShelf
+orderId=5bbbcd8e-84f8-4aaf-bb8e-83b865473cdf, name=Fudge Ice Cream Cake, temperature=Frozen,shelfLifeInSecs=415,decayRate=0.49, orderState=DeliveredFromRegularShelf
+orderId=87f22358-3903-47f9-96cd-7eecd6f3e9ee, name=Mint Chocolate Ice Cream, temperature=Frozen,shelfLifeInSecs=290,decayRate=0.5, orderState=DeliveredFromRegularShelf
+orderId=7e3203a1-c141-4327-9ae1-c547e155b7fb, name=Vegan Pizza, temperature=Hot,shelfLifeInSecs=200,decayRate=0.7, orderState=DeliveredFromRegularShelf
+orderId=c4d633b8-273a-43ca-9512-a5e523306e23, name=Orange Chicken, temperature=Hot,shelfLifeInSecs=215,decayRate=0.67, orderState=DeliveredFromRegularShelf
+orderId=16d3e896-0015-4976-8218-156fea11b2c1, name=MeatLoaf, temperature=Hot,shelfLifeInSecs=213,decayRate=0.5, orderState=DeliveredFromRegularShelf
+orderId=667e476c-7410-438e-8251-c785e520b97c, name=Milk, temperature=Cold,shelfLifeInSecs=252,decayRate=0.15, orderState=DeliveredFromRegularShelf
+orderId=32801736-7a28-456f-b4d9-cd76cf792053, name=Pastrami Sandwich, temperature=Hot,shelfLifeInSecs=190,decayRate=0.8, orderState=DeliveredFromRegularShelf
+orderId=4a3b9876-010e-4edf-851a-430355636594, name=Arugula, temperature=Cold,shelfLifeInSecs=251,decayRate=0.27, orderState=DeliveredFromRegularShelf
+orderId=37e4aace-4cbe-4b33-880c-f4da29958a6e, name=Pickles, temperature=Cold,shelfLifeInSecs=259,decayRate=0.29, orderState=DeliveredFromRegularShelf
+orderId=56e5d7a7-7a1e-4dca-8a0f-8870c132e002, name=Chicken, temperature=Hot,shelfLifeInSecs=201,decayRate=0.74, orderState=DeliveredFromRegularShelf
+orderId=224cab64-51a1-414f-889f-6a6042f889fc, name=Cookie Dough, temperature=Frozen,shelfLifeInSecs=600,decayRate=0.15, orderState=DeliveredFromRegularShelf
+orderId=86b9c5e3-c34f-48ca-a970-93d321df7afc, name=Hamburger, temperature=Hot,shelfLifeInSecs=200,decayRate=0.63, orderState=DeliveredFromRegularShelf
+orderId=c97c0281-6672-4f98-bf1b-df9c0ad1e43b, name=French Fries, temperature=Hot,shelfLifeInSecs=220,decayRate=0.67, orderState=DeliveredFromRegularShelf
+orderId=f712ce9e-c57f-450d-af76-4a27dc1c6059, name=Ice, temperature=Frozen,shelfLifeInSecs=100,decayRate=0.9, orderState=DeliveredFromRegularShelf
+orderId=b6616656-af21-4093-982f-cc3648a0a7f1, name=Carne Asada, temperature=Hot,shelfLifeInSecs=222,decayRate=0.71, orderState=DeliveredFromRegularShelf
+orderId=8ea82f03-e4c0-4fa4-b2ac-5191a2e48d97, name=Sherbet, temperature=Frozen,shelfLifeInSecs=175,decayRate=0.6, orderState=DeliveredFromRegularShelf
+orderId=e6f12b6b-aeb6-4c30-b20b-17633e02bf94, name=Orange Sorbet, temperature=Frozen,shelfLifeInSecs=165,decayRate=0.65, orderState=DeliveredFromRegularShelf
+orderId=3c5aeb86-aa64-48e9-b2cd-a7fa19a60797, name=Frosty, temperature=Frozen,shelfLifeInSecs=135,decayRate=0.52, orderState=DeliveredFromRegularShelf
+orderId=0fc5868e-3b29-48a8-bd30-71e899547306, name=Fresh Bread, temperature=Hot,shelfLifeInSecs=201,decayRate=0.9, orderState=DeliveredFromRegularShelf
+orderId=242e731b-cf25-4eeb-b4a1-8ae1705c401f, name=Burrito, temperature=Hot,shelfLifeInSecs=202,decayRate=0.72, orderState=DeliveredFromRegularShelf
+orderId=726f5609-3e08-4e2b-8424-fd3a38da0516, name=Icy, temperature=Frozen,shelfLifeInSecs=230,decayRate=0.6, orderState=DeliveredFromRegularShelf
+orderId=c4906143-94ae-4d7a-ac16-236593ff9689, name=Push Pop, temperature=Frozen,shelfLifeInSecs=220,decayRate=0.5, orderState=DeliveredFromRegularShelf
+orderId=769de0b6-b44f-4054-873b-e487695e470e, name=Pasta, temperature=Hot,shelfLifeInSecs=200,decayRate=0.7, orderState=DeliveredFromRegularShelf
+orderId=3d8391a6-d987-4fcf-b70d-e309ba33ae0e, name=Chicken Nuggets, temperature=Hot,shelfLifeInSecs=205,decayRate=0.71, orderState=DeliveredFromRegularShelf
+orderId=6c1d1303-77a7-406f-a30d-f25f5a578505, name=Ice Cream Sandwich, temperature=Frozen,shelfLifeInSecs=250,decayRate=0.5, orderState=DeliveredFromRegularShelf
+orderId=5eadfbcb-63d4-45f8-af23-5315172e2b01, name=Taco, temperature=Hot,shelfLifeInSecs=198,decayRate=0.38, orderState=DeliveredFromRegularShelf
+orderId=a04a3771-8884-4703-9248-e2442ce2c060, name=Tomato Soup, temperature=Hot,shelfLifeInSecs=243,decayRate=0.71, orderState=DeliveredFromRegularShelf
+orderId=ed092b7d-5797-431f-9322-d422b71a3b76, name=Vanilla Ice Cream, temperature=Frozen,shelfLifeInSecs=310,decayRate=0.35, orderState=DeliveredFromRegularShelf
+orderId=c68df872-fca2-4f5a-abd2-4ea494619932, name=Poppers, temperature=Hot,shelfLifeInSecs=204,decayRate=0.78, orderState=DeliveredFromRegularShelf
+orderId=7aca9e6f-8a19-49bb-a741-4a6e72294027, name=Popsicle, temperature=Frozen,shelfLifeInSecs=345,decayRate=0.75, orderState=DeliveredFromRegularShelf
+orderId=2258b9fd-df4f-4d52-9239-48d422e5f6a5, name=Strawberries, temperature=Frozen,shelfLifeInSecs=500,decayRate=0.05, orderState=DeliveredFromRegularShelf
+orderId=b6f15b4a-1a02-4cf2-b61d-0e6329e350bc, name=Brown Rice, temperature=Hot,shelfLifeInSecs=224,decayRate=0.64, orderState=DeliveredFromRegularShelf
+orderId=4e255490-58f2-46ef-8835-58bba279570b, name=Cheese Pizza, temperature=Hot,shelfLifeInSecs=200,decayRate=0.76, orderState=DeliveredFromRegularShelf
+orderId=0e8b8276-dd7e-4b87-a634-29e97036473c, name=Pressed Juice, temperature=Cold,shelfLifeInSecs=250,decayRate=0.2, orderState=DeliveredFromRegularShelf
+orderId=778e3507-7171-4f41-9c9d-b0e6100ca95d, name=Coconut, temperature=Cold,shelfLifeInSecs=254,decayRate=0.22, orderState=DeliveredFromRegularShelf
+orderId=f1276db4-8be7-45c4-b57e-5a4ab9285594, name=Onion Rings, temperature=Hot,shelfLifeInSecs=201,decayRate=0.7, orderState=DeliveredFromRegularShelf
+orderId=d6997f54-2316-45b7-8d01-2584705b839b, name=Fish Tacos, temperature=Hot,shelfLifeInSecs=207,decayRate=0.74, orderState=DeliveredFromRegularShelf
+orderId=5e96d315-b58b-494b-967a-4fcdcadf3784, name=Pot Stickers, temperature=Hot,shelfLifeInSecs=204,decayRate=0.73, orderState=DeliveredFromRegularShelf
+orderId=0dfee814-7381-4206-834f-332c989ee648, name=Kombucha, temperature=Cold,shelfLifeInSecs=246,decayRate=0.19, orderState=DeliveredFromRegularShelf
+orderId=d2586575-c65e-4ecf-991b-7cc7ef3af9d5, name=Mixed Greens, temperature=Cold,shelfLifeInSecs=252,decayRate=0.26, orderState=DeliveredFromRegularShelf
+orderId=fa21da8e-ac57-4c51-a0f4-5a1ab28a252a, name=Sushi, temperature=Cold,shelfLifeInSecs=251,decayRate=0.25, orderState=DeliveredFromRegularShelf
+orderId=3c206818-4862-4f45-94d9-3d1feaf7a45e, name=Apples, temperature=Cold,shelfLifeInSecs=244,decayRate=0.23, orderState=DeliveredFromRegularShelf
+orderId=f699a023-679b-4648-8041-962eed747899, name=Kebab, temperature=Hot,shelfLifeInSecs=200,decayRate=0.54, orderState=DeliveredFromRegularShelf
+orderId=5b5a3fdc-fd2d-482e-89a5-26e0c2d2949c, name=Mac & Cheese, temperature=Hot,shelfLifeInSecs=205,decayRate=0.51, orderState=DeliveredFromRegularShelf
+orderId=582ba61c-5a4b-4e86-a3db-fb507c9d8c4c, name=Corn Dog, temperature=Hot,shelfLifeInSecs=203,decayRate=0.3, orderState=DeliveredFromRegularShelf
+orderId=15c2340b-c80a-4922-8fdd-2fd029e75a5f, name=Grilled Corn Salad, temperature=Cold,shelfLifeInSecs=305,decayRate=0.1, orderState=DeliveredFromRegularShelf
+orderId=0a1dbc6d-7baa-4b7c-b6c8-7c76dad787c5, name=Pistachio Ice Cream, temperature=Frozen,shelfLifeInSecs=175,decayRate=0.4, orderState=DeliveredFromRegularShelf
+orderId=a2c3d1ec-a1ca-4e75-b899-b859043e78bd, name=Strawberyy Banana Split, temperature=Frozen,shelfLifeInSecs=24,decayRate=0.6, orderState=DeliveredFromRegularShelf
+orderId=e23606d9-7d8b-42c1-9976-ff591bdd2931, name=McFlury, temperature=Frozen,shelfLifeInSecs=372,decayRate=0.45, orderState=DeliveredFromRegularShelf
+orderId=51226eb6-fc47-400d-8f06-b4b1e312ad82, name=Acai Bowl, temperature=Cold,shelfLifeInSecs=240,decayRate=0.9, orderState=DeliveredFromRegularShelf
+orderId=fbe6d2a7-a1af-4885-b2f7-adff5f3a3d3e, name=Yogurt, temperature=Cold,shelfLifeInSecs=400,decayRate=0.67, orderState=DeliveredFromRegularShelf
+orderId=d86c587c-6512-4f2f-b788-b50832752267, name=Chocolate Gelato, temperature=Frozen,shelfLifeInSecs=308,decayRate=0.67, orderState=DeliveredFromRegularShelf
+orderId=098153a9-d30e-41d2-9959-2af373d9d14b, name=Cobb Salad, temperature=Cold,shelfLifeInSecs=263,decayRate=0.2, orderState=DeliveredFromRegularShelf
+orderId=e94cf9ee-372f-4668-8e80-540c191a46e3, name=Cottage Cheese, temperature=Cold,shelfLifeInSecs=255,decayRate=0.26, orderState=DeliveredFromRegularShelf
+orderId=3431b020-0c6e-424f-a181-667e26059e79, name=Coke, temperature=Cold,shelfLifeInSecs=240,decayRate=0.25, orderState=DeliveredFromRegularShelf
+orderId=e4a03e7d-af13-43b7-b28b-164fa40b00d0, name=Snow Cone, temperature=Frozen,shelfLifeInSecs=50,decayRate=0.86, orderState=DeliveredFromRegularShelf
+orderId=97c22750-00b1-4c69-94db-876b32f7a4b2, name=Pad See Ew, temperature=Hot,shelfLifeInSecs=210,decayRate=0.72, orderState=DeliveredFromRegularShelf
+orderId=5e00e84a-ac33-4b3f-9eb2-f0b3ce17a521, name=Chunky Monkey, temperature=Frozen,shelfLifeInSecs=210,decayRate=0.54, orderState=DeliveredFromRegularShelf
+orderId=254fcf55-1144-42c4-a14d-6198affffd11, name=Beef Stew, temperature=Hot,shelfLifeInSecs=206,decayRate=0.69, orderState=DeliveredFromRegularShelf
+orderId=4666c0b1-a5c1-4a98-bb5f-78227df108a9, name=Cheese, temperature=Cold,shelfLifeInSecs=255,decayRate=0.2, orderState=DeliveredFromRegularShelf
+orderId=e7578a02-9130-4d33-8826-99ab9317487a, name=Spinach Omelet, temperature=Hot,shelfLifeInSecs=230,decayRate=0.63, orderState=DeliveredFromRegularShelf
+orderId=c8793376-83d0-4240-bcca-83918f117eaf, name=Beef Hash, temperature=Hot,shelfLifeInSecs=30,decayRate=0.74, orderState=DeliveredFromRegularShelf
+orderId=6d383624-b3ee-419d-975b-8f2545321303, name=Pork Chop, temperature=Hot,shelfLifeInSecs=200,decayRate=0.7, orderState=DeliveredFromRegularShelf
+orderId=ebe04095-96b6-4a01-be3d-f038f7d33a3e, name=Kale Salad, temperature=Cold,shelfLifeInSecs=250,decayRate=0.25, orderState=DeliveredFromRegularShelf
+orderId=1d899e16-1b4b-46b6-b317-22c7b7260be2, name=Fresh Fruit, temperature=Cold,shelfLifeInSecs=252,decayRate=0.29, orderState=DeliveredFromRegularShelf
+orderId=9625b2dd-412d-421d-9f93-ecca727656ad, name=Cranberry Salad, temperature=Cold,shelfLifeInSecs=245,decayRate=0.21, orderState=DeliveredFromRegularShelf
+orderId=c7680693-228b-4b2b-abfd-a128904a34f7, name=Fudge Ice Cream Cake, temperature=Frozen,shelfLifeInSecs=415,decayRate=0.49, orderState=DeliveredFromRegularShelf
+orderId=fa13bb65-6346-4ec5-819c-098e0fc2733e, name=Mint Chocolate Ice Cream, temperature=Frozen,shelfLifeInSecs=290,decayRate=0.5, orderState=DeliveredFromRegularShelf
+orderId=767da132-de77-47ae-9955-411ead7a121d, name=Vegan Pizza, temperature=Hot,shelfLifeInSecs=200,decayRate=0.7, orderState=DeliveredFromRegularShelf
+orderId=14da5175-7578-4597-8ff8-6c1ec6fb8a64, name=Orange Chicken, temperature=Hot,shelfLifeInSecs=215,decayRate=0.67, orderState=DeliveredFromRegularShelf
+orderId=3bfb0983-00ba-4a41-836d-907c7234e3c7, name=MeatLoaf, temperature=Hot,shelfLifeInSecs=213,decayRate=0.5, orderState=DeliveredFromRegularShelf
+orderId=adfebe7b-d70c-4d64-bae4-06ef5c7e31af, name=Milk, temperature=Cold,shelfLifeInSecs=252,decayRate=0.15, orderState=DeliveredFromRegularShelf
+orderId=a60e6a2b-b0d2-4cd0-b847-5dd5275d27b7, name=Pastrami Sandwich, temperature=Hot,shelfLifeInSecs=190,decayRate=0.8, orderState=DeliveredFromRegularShelf
+orderId=232a5c01-c0f8-4d79-b42a-aed8b043de9c, name=Arugula, temperature=Cold,shelfLifeInSecs=251,decayRate=0.27, orderState=DeliveredFromRegularShelf
+orderId=e4d91ace-1eaa-4211-89d9-eada7be8dcf3, name=Pickles, temperature=Cold,shelfLifeInSecs=259,decayRate=0.29, orderState=DeliveredFromRegularShelf
+orderId=9d9ed275-681a-47ae-b9eb-f380bfb17d17, name=Chicken, temperature=Hot,shelfLifeInSecs=201,decayRate=0.74, orderState=DeliveredFromRegularShelf
+orderId=10e828dc-5638-4201-8710-42821b322110, name=Cookie Dough, temperature=Frozen,shelfLifeInSecs=600,decayRate=0.15, orderState=DeliveredFromRegularShelf
+orderId=c6ccae41-a58f-4dad-afcd-c73fbd843ce5, name=Hamburger, temperature=Hot,shelfLifeInSecs=200,decayRate=0.63, orderState=DeliveredFromRegularShelf
+orderId=169b1446-31fe-43c4-bb83-6444dd96b96c, name=French Fries, temperature=Hot,shelfLifeInSecs=220,decayRate=0.67, orderState=DeliveredFromRegularShelf
+orderId=e7ccdf97-21c8-4957-adb1-29a527d3164e, name=Ice, temperature=Frozen,shelfLifeInSecs=100,decayRate=0.9, orderState=DeliveredFromRegularShelf
+orderId=542b3772-0029-473f-819f-62f972f2fc67, name=Carne Asada, temperature=Hot,shelfLifeInSecs=222,decayRate=0.71, orderState=DeliveredFromRegularShelf
+orderId=766f62a0-cf60-4ce6-be67-b2417d3d9157, name=Sherbet, temperature=Frozen,shelfLifeInSecs=175,decayRate=0.6, orderState=DeliveredFromRegularShelf
+orderId=3b7bc973-ba61-44d1-8de9-4987f743d101, name=Orange Sorbet, temperature=Frozen,shelfLifeInSecs=165,decayRate=0.65, orderState=DeliveredFromRegularShelf
+orderId=88bfb304-2e4f-49a9-b6d9-0ce61b6e7134, name=Frosty, temperature=Frozen,shelfLifeInSecs=135,decayRate=0.52, orderState=DeliveredFromRegularShelf
+orderId=e16f2093-d7b2-4a47-892a-8087087d8aa2, name=Fresh Bread, temperature=Hot,shelfLifeInSecs=201,decayRate=0.9, orderState=DeliveredFromRegularShelf
+orderId=61f09e40-f1af-45c9-8f1c-7d53643575ed, name=Burrito, temperature=Hot,shelfLifeInSecs=202,decayRate=0.72, orderState=DeliveredFromRegularShelf
+orderId=227bb361-570d-4672-9443-61de682e1c9b, name=Icy, temperature=Frozen,shelfLifeInSecs=230,decayRate=0.6, orderState=DeliveredFromRegularShelf
+orderId=2f0e2da6-9c8d-40c7-a148-6204ced057cc, name=Push Pop, temperature=Frozen,shelfLifeInSecs=220,decayRate=0.5, orderState=DeliveredFromRegularShelf
+orderId=bce8a840-9b2e-4d9d-8941-68648d634241, name=Pasta, temperature=Hot,shelfLifeInSecs=200,decayRate=0.7, orderState=DeliveredFromRegularShelf
+orderId=1d79733b-a371-4777-841d-2db16e984bc9, name=Chicken Nuggets, temperature=Hot,shelfLifeInSecs=205,decayRate=0.71, orderState=DeliveredFromRegularShelf
+orderId=4819e56b-4b22-497a-8e1b-972dfcace00b, name=Ice Cream Sandwich, temperature=Frozen,shelfLifeInSecs=250,decayRate=0.5, orderState=DeliveredFromRegularShelf
+orderId=fd8d081f-4ca1-4c00-beb4-a516d981c611, name=Taco, temperature=Hot,shelfLifeInSecs=198,decayRate=0.38, orderState=DeliveredFromRegularShelf
+orderId=73981b6b-5a9b-48bc-a831-59945bf01196, name=Tomato Soup, temperature=Hot,shelfLifeInSecs=243,decayRate=0.71, orderState=DeliveredFromRegularShelf
+orderId=0e9ef033-32ec-495d-a59e-9251ad2588b2, name=Vanilla Ice Cream, temperature=Frozen,shelfLifeInSecs=310,decayRate=0.35, orderState=DeliveredFromRegularShelf
+orderId=2bbbe79f-9321-472b-90c3-32e914325e43, name=Poppers, temperature=Hot,shelfLifeInSecs=204,decayRate=0.78, orderState=DeliveredFromRegularShelf
+orderId=14fa8090-f7a2-4dc1-b8e7-288fab312eb6, name=Popsicle, temperature=Frozen,shelfLifeInSecs=345,decayRate=0.75, orderState=DeliveredFromRegularShelf
+orderId=10edf607-b7c4-4765-9b5c-7a716d311d70, name=Strawberries, temperature=Frozen,shelfLifeInSecs=500,decayRate=0.05, orderState=DeliveredFromRegularShelf
+orderId=f6fd5a09-c44b-42c1-801f-3eefbd54e3d2, name=Brown Rice, temperature=Hot,shelfLifeInSecs=224,decayRate=0.64, orderState=DeliveredFromRegularShelf
+orderId=94429e92-51e1-4374-84a5-c02af2a71aa0, name=Cheese Pizza, temperature=Hot,shelfLifeInSecs=200,decayRate=0.76, orderState=DeliveredFromRegularShelf
+orderId=5f2b8b67-87e2-4dee-94df-c7a2a856bef1, name=Pressed Juice, temperature=Cold,shelfLifeInSecs=250,decayRate=0.2, orderState=DeliveredFromRegularShelf
+orderId=3f287374-0f5b-4192-8504-aa1d8ff81b55, name=Coconut, temperature=Cold,shelfLifeInSecs=254,decayRate=0.22, orderState=DeliveredFromRegularShelf
+orderId=bf139d93-1cf8-445c-a962-57e30701b01f, name=Onion Rings, temperature=Hot,shelfLifeInSecs=201,decayRate=0.7, orderState=DeliveredFromRegularShelf
+orderId=7ac7be49-6579-4c51-b059-b90c14b9974f, name=Fish Tacos, temperature=Hot,shelfLifeInSecs=207,decayRate=0.74, orderState=DeliveredFromRegularShelf
+orderId=e869d74e-1f09-4875-a704-a45e43136a1c, name=Pot Stickers, temperature=Hot,shelfLifeInSecs=204,decayRate=0.73, orderState=DeliveredFromRegularShelf
+orderId=0c30e5b5-3972-4581-a84c-f0652df1fce7, name=Kombucha, temperature=Cold,shelfLifeInSecs=246,decayRate=0.19, orderState=DeliveredFromRegularShelf
+orderId=b6642ca5-37c4-4657-939c-06fdcf8406c4, name=Mixed Greens, temperature=Cold,shelfLifeInSecs=252,decayRate=0.26, orderState=DeliveredFromRegularShelf
+orderId=f5641a67-59af-4ce4-a9f8-64a42c20a378, name=Sushi, temperature=Cold,shelfLifeInSecs=251,decayRate=0.25, orderState=DeliveredFromRegularShelf
+orderId=c6a55d8c-c2d9-4c7e-a9e7-f7472f537844, name=Apples, temperature=Cold,shelfLifeInSecs=244,decayRate=0.23, orderState=DeliveredFromRegularShelf
+orderId=e568f7a3-931a-4cf0-9793-ac48f9e419c8, name=Kebab, temperature=Hot,shelfLifeInSecs=200,decayRate=0.54, orderState=DeliveredFromRegularShelf
+orderId=2d005913-4901-4dee-a2d2-b5ff96bfad8b, name=Mac & Cheese, temperature=Hot,shelfLifeInSecs=205,decayRate=0.51, orderState=DeliveredFromRegularShelf
+orderId=c1e909f3-9518-4f14-b372-8772e98cf8e8, name=Corn Dog, temperature=Hot,shelfLifeInSecs=203,decayRate=0.3, orderState=DeliveredFromRegularShelf
+orderId=979992a9-a295-4d7a-bb0a-432c8979856e, name=Grilled Corn Salad, temperature=Cold,shelfLifeInSecs=305,decayRate=0.1, orderState=DeliveredFromRegularShelf
+orderId=0545e40c-b615-4a19-91b4-268896635e30, name=Pistachio Ice Cream, temperature=Frozen,shelfLifeInSecs=175,decayRate=0.4, orderState=DeliveredFromRegularShelf
+orderId=7a569515-1592-4d80-8ae2-1f82a8ae268e, name=Banana Split, temperature=Frozen,shelfLifeInSecs=20,decayRate=0.63, orderState=DeliveredFromRegularShelf
